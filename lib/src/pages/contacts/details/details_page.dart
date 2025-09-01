@@ -1,6 +1,7 @@
 import 'package:aula_flutter_web/src/pages/contacts/models/contact_model.dart';
 import 'package:aula_flutter_web/src/pages/contacts/repositories/contact_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class DetailsPage extends StatefulWidget {
   final int? id;
@@ -51,6 +52,12 @@ class _DetailsPageState extends State<DetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: BackButton(
+          onPressed: () {
+            context.go('/');
+            // Navigator.of(context).pop();
+          },
+        ),
         title: (widget.id == null)
             ? Text('Novo Contato')
             : Text('#${contact?.id} - ${contact?.name}'),
@@ -78,7 +85,8 @@ class _DetailsPageState extends State<DetailsPage> {
                 await salvar();
 
                 if (context.mounted) {
-                  Navigator.of(context).pop(true);
+                  context.go('/');
+                  //   Navigator.of(context).pop(true);
                 }
               },
               child: const Text('Salvar'),

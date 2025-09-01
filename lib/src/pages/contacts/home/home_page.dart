@@ -66,12 +66,15 @@ class _HomePageState extends State<HomePage> {
                             //   '/details',
                             //   arguments: contact.id,
                             // );
-                            final value = await context.push(
+                            // final value = await context.push(
+                            //   '/details/${contact.id}',
+                            // );
+                            context.go(
                               '/details/${contact.id}',
                             );
-                            if (value == true) {
-                              _loadContacts();
-                            }
+                            // if (value == true) {
+                            //   _loadContacts();
+                            // }
                           },
                         ),
                         IconButton(
@@ -103,10 +106,11 @@ class _HomePageState extends State<HomePage> {
           //   context,
           //   '/details',
           // );
-          final value = await context.push('/create');
-          if (value == true) {
-            _loadContacts();
-          }
+          // final value = await context.push('/create');
+          final value = context.go('/create');
+          // if (value == true) {
+          //   _loadContacts();
+          // }
         },
         child: const Icon(Icons.add),
       ),
