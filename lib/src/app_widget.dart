@@ -15,7 +15,7 @@ class AppWidget extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (_) => const HomePage(),
-        '/details': (_) {
+        '/details': (context) {
           final args = ModalRoute.of(context)?.settings.arguments as int?;
           return DetailsPage(
             id: args,
