@@ -1,6 +1,7 @@
 import 'package:aula_flutter_web/src/pages/contacts/models/contact_model.dart';
 import 'package:aula_flutter_web/src/pages/contacts/repositories/contact_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -60,10 +61,13 @@ class _HomePageState extends State<HomePage> {
                           icon: const Icon(Icons.edit),
                           tooltip: 'Editar',
                           onPressed: () async {
-                            final value = await Navigator.pushNamed(
-                              context,
-                              '/details',
-                              arguments: contact.id,
+                            // final value = await Navigator.pushNamed(
+                            //   context,
+                            //   '/details',
+                            //   arguments: contact.id,
+                            // );
+                            final value = await context.push(
+                              '/details/${contact.id}',
                             );
                             if (value == true) {
                               _loadContacts();
@@ -95,10 +99,11 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          final value = await Navigator.pushNamed(
-            context,
-            '/details',
-          );
+          // final value = await Navigator.pushNamed(
+          //   context,
+          //   '/details',
+          // );
+          final value = await context.push('/create');
           if (value == true) {
             _loadContacts();
           }
