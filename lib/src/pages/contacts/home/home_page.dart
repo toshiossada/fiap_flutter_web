@@ -1,3 +1,5 @@
+import 'package:aula_flutter_web/src/app_controller.dart';
+import 'package:aula_flutter_web/src/core/context_extension.dart';
 import 'package:aula_flutter_web/src/pages/contacts/models/contact_model.dart';
 import 'package:aula_flutter_web/src/pages/contacts/repositories/contact_repository.dart';
 import 'package:flutter/material.dart';
@@ -38,13 +40,42 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Contacts Home Page')),
+      appBar: AppBar(
+        title: Text(context.l10n.contacts_title_page),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: DropdownButton<String>(
+              value: appController.locale.languageCode,
+              icon: const Icon(Icons.language, color: Colors.white),
+              dropdownColor: Colors.white,
+              onChanged: (String? newLocale) {
+                if (newLocale != null) {
+                  appController.store.locale = appController.supportedLocales
+                      .firstWhere(
+                        (element) => element.languageCode == newLocale,
+                      );
+                }
+              },
+              items: appController.supportedLocales.map((locale) {
+                return DropdownMenuItem<String>(
+                  value: locale.languageCode,
+                  child: Text(
+                    locale.languageCode.toUpperCase(),
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (loading) const Center(child: CircularProgressIndicator()),
           if (!loading && contacts.isEmpty)
-            const Center(child: Text('Nenhum contato cadastrado')),
+            Center(child: Text(context.l10n.no_contacts_label)),
           if (!loading && contacts.isNotEmpty)
             Expanded(
               child: ListView.builder(
@@ -59,33 +90,24 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.edit),
-                          tooltip: 'Editar',
+                          tooltip: context.l10n.edit_tooltip,
                           onPressed: () async {
-                            // final value = await Navigator.pushNamed(
-                            //   context,
-                            //   '/details',
-                            //   arguments: contact.id,
-                            // );
-                            // final value = await context.push(
-                            //   '/details/${contact.id}',
-                            // );
                             context.go(
                               '/details/${contact.id}',
                             );
-                            // if (value == true) {
-                            //   _loadContacts();
-                            // }
                           },
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete),
-                          tooltip: 'Deletar',
+                          tooltip: context.l10n.delete_tooltip,
                           onPressed: () async {
                             await repository.delete(contact.id);
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Usuario Deletado'),
+                                SnackBar(
+                                  content: Text(
+                                    context.l10n.deleted_user_snackbar,
+                                  ),
                                 ),
                               );
                             }
@@ -102,15 +124,7 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // final value = await Navigator.pushNamed(
-          //   context,
-          //   '/details',
-          // );
-          // final value = await context.push('/create');
-          final value = context.go('/create');
-          // if (value == true) {
-          //   _loadContacts();
-          // }
+          context.go('/create');
         },
         child: const Icon(Icons.add),
       ),
