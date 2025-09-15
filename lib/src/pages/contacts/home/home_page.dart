@@ -1,9 +1,10 @@
 import 'package:aula_flutter_web/src/app_controller.dart';
 import 'package:aula_flutter_web/src/core/context_extension.dart';
 import 'package:aula_flutter_web/src/pages/contacts/models/contact_model.dart';
-import 'package:aula_flutter_web/src/pages/contacts/repositories/contact_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../../repositories/contact_remote_repository.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,7 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final repository = ContactRepository();
+  final repository = ContactRemoteRepository();
   var contacts = <ContactModel>[];
   var loading = false;
 

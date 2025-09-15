@@ -1,7 +1,9 @@
 import 'package:aula_flutter_web/src/pages/contacts/models/contact_model.dart';
-import 'package:aula_flutter_web/src/pages/contacts/repositories/contact_repository.dart';
+import 'package:aula_flutter_web/src/repositories/contact_local_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../../repositories/contact_remote_repository.dart';
 
 class DetailsPage extends StatefulWidget {
   final int? id;
@@ -12,7 +14,7 @@ class DetailsPage extends StatefulWidget {
 }
 
 class _DetailsPageState extends State<DetailsPage> {
-  final repository = ContactRepository();
+  final repository = ContactRemoteRepository();
   final nameController = TextEditingController();
   final emailController = TextEditingController();
 
@@ -37,7 +39,7 @@ class _DetailsPageState extends State<DetailsPage> {
   Future<void> salvar() async {
     // Salvar contato
     final newContact = ContactModel(
-      id: contact?.id ?? 0,
+      id: contact?.id ?? '',
       name: nameController.text,
       email: emailController.text,
     );
