@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../core/interceptor/common_interceptor.dart';
 import '../pages/contacts/models/contact_model.dart';
 
 class ContactRemoteRepository {
@@ -10,6 +11,10 @@ class ContactRemoteRepository {
           'https://firestore.googleapis.com/v1/projects/$projectId/databases/(default)/documents',
     ),
   );
+
+  ContactRemoteRepository() {
+    http.interceptors.add(CommonInterceptor());
+  }
 
   Future<void> delete(String id) async {
     await http.delete('/contacts/$id');
