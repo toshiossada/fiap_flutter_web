@@ -27,16 +27,29 @@ class ContactRemoteRepository {
     );
   }
 
-  Future<List<ContactModel>> getAll() async {
-    final response = await http.get('/contacts');
+  Future<(List<ContactModel>, String?)> getAll({
+    String? page,
+    int? limit,
+  }) async {
+    final response = await http.get(
+      '/contacts',
+      queryParameters: {
+        'pageSize': limit ?? 0,
+        'pageToken': page,
+      },
+    );
     if (response.statusCode == 200) {
       final data = response.data['documents'] as List;
-      return data.map((e) => ContactModel.fromFirebase(e)).toList();
+      final result = data.map((e) => ContactModel.fromFirebase(e)).toList();
+      return (
+        result,
+        response.data['nextPageToken'] as String?,
+      );
     }
-    return [];
+    return (<ContactModel>[], null);
   }
 
-  Future<ContactModel> getById(int id) async {
+  Future<ContactModel> getById(String id) async {
     final response = await http.get('/contacts/$id');
     if (response.statusCode == 200) {
       return ContactModel.fromFirebase(response.data);

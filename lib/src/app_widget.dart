@@ -25,7 +25,7 @@ final _router = GoRouter(
       builder: (_, state) {
         final idStr = state.pathParameters['id'];
         final id = idStr != null ? int.tryParse(idStr) : null;
-        return DetailsPage(id: id);
+        return DetailsPage(id: idStr);
       },
     ),
   ],

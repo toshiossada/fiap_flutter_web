@@ -1,12 +1,11 @@
 import 'package:aula_flutter_web/src/pages/contacts/models/contact_model.dart';
-import 'package:aula_flutter_web/src/repositories/contact_local_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../repositories/contact_remote_repository.dart';
 
 class DetailsPage extends StatefulWidget {
-  final int? id;
+  final String? id;
   const DetailsPage({super.key, this.id});
 
   @override

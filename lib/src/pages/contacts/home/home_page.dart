@@ -17,6 +17,8 @@ class _HomePageState extends State<HomePage> {
   final repository = ContactRemoteRepository();
   var contacts = <ContactModel>[];
   var loading = false;
+  String? nextPage;
+  final limit = 15;
 
   @override
   void initState() {
@@ -24,18 +26,32 @@ class _HomePageState extends State<HomePage> {
     _loadContacts();
   }
 
-  _loadContacts() async {
+  _loadContacts({String? page}) async {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       setState(() {
         loading = true;
       });
-      // await Future.delayed(const Duration(seconds: 3));
-      contacts = await repository.getAll();
+      final (result, newPage) = await repository.getAll(
+        limit: limit,
+        page: page,
+      );
+      nextPage = newPage;
+      if (page != null) {
+        contacts.addAll(result);
+      } else {
+        contacts = result;
+      }
 
       setState(() {
         loading = false;
       });
     });
+  }
+
+  fetchNextPage() async {
+    if (nextPage == null) return;
+
+    _loadContacts(page: nextPage);
   }
 
   @override
@@ -44,6 +60,10 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text(context.l10n.contacts_title_page),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: fetchNextPage,
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: DropdownButton<String>(
