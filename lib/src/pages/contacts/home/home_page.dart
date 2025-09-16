@@ -1,7 +1,10 @@
+import 'package:aula_flutter_web/src/app_controller.dart';
+import 'package:aula_flutter_web/src/core/context_extension.dart';
 import 'package:aula_flutter_web/src/pages/contacts/models/contact_model.dart';
-import 'package:aula_flutter_web/src/pages/contacts/repositories/contact_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../../repositories/contact_remote_repository.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,45 +14,124 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final repository = ContactRepository();
+  final repository = ContactRemoteRepository();
   var contacts = <ContactModel>[];
   var loading = false;
+  String? nextPage;
+  final limit = 12;
+  final _scrollController = ScrollController();
+  bool isFetchingMore = false;
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
     _loadContacts();
   }
 
-  _loadContacts() async {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      setState(() {
-        loading = true;
-      });
-      // await Future.delayed(const Duration(seconds: 3));
-      contacts = await repository.getAll();
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 200 &&
+        !loading &&
+        !isFetchingMore &&
+        nextPage != null) {
+      isFetchingMore = true;
+      fetchNextPage().then((_) {
+        isFetchingMore = false;
+      });
+    }
+  }
+
+  _loadContacts({String? page}) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (page == null) {
+        setState(() {
+          loading = true;
+        });
+      }
+      final (result, newPage) = await repository.getAll(
+        limit: limit,
+        page: page,
+      );
+      nextPage = newPage;
+      if (page != null) {
+        contacts.addAll(result);
+      } else {
+        contacts = result;
+      }
       setState(() {
         loading = false;
       });
     });
   }
 
+  fetchNextPage() async {
+    if (nextPage == null) return;
+
+    _loadContacts(page: nextPage);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Contacts Home Page')),
+      appBar: AppBar(
+        title: Text(context.l10n.contacts_title_page),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: fetchNextPage,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: DropdownButton<String>(
+              value: appController.locale.languageCode,
+              icon: const Icon(Icons.language, color: Colors.white),
+              dropdownColor: Colors.white,
+              onChanged: (String? newLocale) {
+                if (newLocale != null) {
+                  appController.store.locale = appController.supportedLocales
+                      .firstWhere(
+                        (element) => element.languageCode == newLocale,
+                      );
+                }
+              },
+              items: appController.supportedLocales.map((locale) {
+                return DropdownMenuItem<String>(
+                  value: locale.languageCode,
+                  child: Text(
+                    locale.languageCode.toUpperCase(),
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (loading) const Center(child: CircularProgressIndicator()),
           if (!loading && contacts.isEmpty)
-            const Center(child: Text('Nenhum contato cadastrado')),
+            Center(child: Text(context.l10n.no_contacts_label)),
           if (!loading && contacts.isNotEmpty)
             Expanded(
               child: ListView.builder(
-                itemCount: contacts.length,
+                controller: _scrollController,
+                itemCount: contacts.length + (nextPage != null ? 1 : 0),
                 itemBuilder: (context, index) {
+                  if (index == contacts.length && nextPage != null) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
                   final contact = contacts[index];
                   return ListTile(
                     title: Text('${contact.id} - ${contact.name}'),
@@ -59,33 +141,24 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.edit),
-                          tooltip: 'Editar',
+                          tooltip: context.l10n.edit_tooltip,
                           onPressed: () async {
-                            // final value = await Navigator.pushNamed(
-                            //   context,
-                            //   '/details',
-                            //   arguments: contact.id,
-                            // );
-                            // final value = await context.push(
-                            //   '/details/${contact.id}',
-                            // );
                             context.go(
                               '/details/${contact.id}',
                             );
-                            // if (value == true) {
-                            //   _loadContacts();
-                            // }
                           },
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete),
-                          tooltip: 'Deletar',
+                          tooltip: context.l10n.delete_tooltip,
                           onPressed: () async {
                             await repository.delete(contact.id);
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Usuario Deletado'),
+                                SnackBar(
+                                  content: Text(
+                                    context.l10n.deleted_user_snackbar,
+                                  ),
                                 ),
                               );
                             }
@@ -102,15 +175,7 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // final value = await Navigator.pushNamed(
-          //   context,
-          //   '/details',
-          // );
-          // final value = await context.push('/create');
-          final value = context.go('/create');
-          // if (value == true) {
-          //   _loadContacts();
-          // }
+          context.go('/create');
         },
         child: const Icon(Icons.add),
       ),

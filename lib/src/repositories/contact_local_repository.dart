@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../models/contact_model.dart';
+import '../pages/contacts/models/contact_model.dart';
 
-class ContactRepository {
-  Future<void> delete(int id) async {
+class ContactLocalRepository {
+  Future<void> delete(String id) async {
     final prefs = await completer.future;
     final contacts = await getAll();
     contacts.removeWhere((e) {
@@ -25,19 +25,19 @@ class ContactRepository {
     completer.complete(prefs);
   }
 
-  ContactRepository() {
+  ContactLocalRepository() {
     init();
   }
 
   Future<void> insert(ContactModel contact) async {
     final prefs = await completer.future;
     final contacts = await getAll();
-    contact.id =
-        contacts.fold<int>(
-          0,
-          (maxId, contact) => contact.id > maxId ? contact.id : maxId,
-        ) +
-        1;
+    // contact.id =
+    //     contacts.fold<int>(
+    //       0,
+    //       (maxId, contact) => contact.id > maxId ? contact.id : maxId,
+    //     ) +
+    //     1;
     contacts.add(contact);
     await prefs.setStringList(
       'contacts',

@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 class ContactModel {
-  int id;
+  String id;
   String name;
   String email;
 
   ContactModel({
-    this.id = 0,
+    this.id = '',
     required this.name,
     required this.email,
   });
@@ -21,10 +21,30 @@ class ContactModel {
 
   factory ContactModel.fromMap(Map<String, dynamic> map) {
     return ContactModel(
-      id: map['id'] as int,
+      id: map['id'] as String,
       name: map['name'] as String,
       email: map['email'] as String,
     );
+  }
+
+  factory ContactModel.fromFirebase(Map<String, dynamic> map) {
+    final id = map['name'].toString().split('/').last;
+    final fields = map['fields'] as Map<String, dynamic>;
+
+    return ContactModel(
+      id: id,
+      name: fields['name']['stringValue'] as String,
+      email: fields['email']['stringValue'] as String,
+    );
+  }
+
+  Map<String, dynamic> toFirebase() {
+    return <String, dynamic>{
+      "fields": {
+        "email": {"stringValue": email},
+        "name": {"stringValue": name},
+      },
+    };
   }
 
   String toJson() => json.encode(toMap());

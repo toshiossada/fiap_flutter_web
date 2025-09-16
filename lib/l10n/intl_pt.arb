@@ -1,0 +1,17 @@
+{
+  "@@locale": "pt",
+  "contacts_title_page": "Página de contatos",
+  "deleted_user_snackbar": "Usuario Deletado",
+  "edit_tooltip": "Editar",
+  "delete_tooltip": "Deletar",
+  "no_contacts_label": "Nenhum contato cadastrado",
+  "hello": "Olá Mundo! {name}",
+  "@hello": {
+    "description": "Texto de saudação",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
+}
