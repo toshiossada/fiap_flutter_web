@@ -1,16 +1,25 @@
-# aula_flutter_web
+Webassembly
+O que é Single Page Application
+flutter create aula_flutter_web --platforms=web
+Mostrar a Estrutura do Projeto
+	
+Stateless x Stateful
+Rotas Nomeadas
+Navegação e Passagem de Parâmetros
+MouseRegion
+Retirar # das rotas
+	setPathUrlStrategy()
+flutter run -d chrome
+GoRouter
+Shared Preferences
+Completers
+	https://api.flutter.dev/flutter/dart-async/Completer-class.html
+Guards
+MediaQuery.of(context).size
+flutter build web
+Publicaçao
+Firebase Hosting
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+firebase login:add
+firebase init
+firebase deploy
